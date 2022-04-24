@@ -8,10 +8,8 @@ class TVMazeClient {
   final String token = Secret.tvMazeToken;
   final String baseUri = "https://api.tvmaze.com/";
 
-  late ShowList showCache;
-
-  Future getShows() async {
-    showCache = ShowList.fromJson(jsonDecode(await _getShowsAsync()));
+  Future<ShowList> getShows() async {
+    return ShowList.fromJson(jsonDecode(await _getShowsAsync()));
   }
 
   /// GET shows : raw JSON
