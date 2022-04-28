@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
 import 'package:flutter_test_1/entities/tvmaze_client.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 void main() => runApp(const MyApp());
 
@@ -14,21 +15,45 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.from(colorScheme: scheme),
-      title: _title,
-      home: const MyStatefulWidget(),
+        theme: ThemeData.from(colorScheme: scheme),
+        title: _title,
+        initialRoute: "/",
+        home: const HomePage(),
+        routes: <String, WidgetBuilder>{
+          '/details': (BuildContext context) => const DetailsPage(),
+        });
+  }
+}
+
+class DetailsPage extends StatelessWidget {
+  const DetailsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var show = ModalRoute.of(context)!.settings.arguments as Show;
+    return Scaffold(
+      appBar: SharedWidgets().mainAppBar,
+      body: Center(
+        child: Container(
+          child: RichText(text: TextSpan(text: show.name)),
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: NetworkImage(
+                      show.image["original"] ?? show.image["medium"]))),
+        ),
+      ),
     );
   }
 }
 
-class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+class _HomePageState extends State<HomePage> {
   final Future<ShowList> showsCache = TVMazeClient().getShows();
 
   @override
@@ -36,20 +61,26 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return Scaffold(
       appBar: SharedWidgets().mainAppBar,
       body: FutureBuilder<ShowList>(
-        future: showsCache, // a previously-obtained Future<String> or null
+        future: showsCache, // Future<T>
         builder: (BuildContext context, AsyncSnapshot<ShowList> snapshot) {
-          List<Widget> children;
+          List<Widget> children = List.empty(growable: true);
           if (snapshot.hasData) {
-            children = [
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: NetworkImage(
-                              snapshot.data?.shows[0].image["medium"]))),
+            for (var show in snapshot.data!.shows) {
+              children.add(GestureDetector(
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: Image.network(show.image["medium"]), flex: 1),
+                    Expanded(child: Text(show.name), flex: 2),
+                  ],
                 ),
-              )
-            ];
+                onTap: () {
+                  // Change state
+                  Navigator.of(context)
+                      .pushReplacementNamed("/details", arguments: show);
+                },
+              ));
+            }
           } else if (snapshot.hasError) {
             children = <Widget>[
               const Icon(
@@ -75,12 +106,11 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               )
             ];
           }
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: children,
-            ),
-          );
+          return SingleChildScrollView(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: children,
+          ));
         },
       ),
     );
@@ -90,7 +120,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 const ColorScheme scheme = ColorScheme(
     brightness: Brightness.light,
     primary: Color.fromRGBO(120, 195, 251, 1),
-    onPrimary: Color.fromRGBO(116, 116, 116, 1),
+    onPrimary: Color.fromARGB(255, 24, 16, 16),
     secondary: Color.fromRGBO(85, 0, 213, 1),
     onSecondary: Color.fromRGBO(249, 249, 237, 1),
     error: Color.fromRGBO(255, 127, 80, 1),
@@ -99,52 +129,3 @@ const ColorScheme scheme = ColorScheme(
     onBackground: Color.fromRGBO(0, 0, 128, 1),
     surface: Color.fromRGBO(120, 195, 251, 1),
     onSurface: Color.fromRGBO(116, 116, 116, 1));
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({Key? key}) : super(key: key);
-
-//   // Root widget
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       theme: ThemeData.from(colorScheme: scheme),
-//       title: 'Welcome to Flutter',
-//       home: const MyStatefulWidget(),
-//     );
-//   }
-
-// class MyStatefulWidget extends StatefulWidget {
-//   const MyStatefulWidget({Key? key}) : super(key: key);
-
-//   @override
-//   State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
-// }
-
-// class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-//   final Future<String> _calculation = Future<String>.delayed(
-//     const Duration(seconds: 2),
-//     () => 'Data Loaded',
-//   );
-  
-//   var tvmClient = TVMazeClient();
-//   tvmClient.getShows();
-  
-//   @override
-//   Widget build(BuildContext context) {
-//     return FutureBuilder(children: [
-//       Expanded(
-//           child: Container(
-//             decoration: BoxDecoration(
-//             image: tvmClient.showCache.shows[0].image["medium"]),
-//             color: Colors.red,
-//           ),
-//           flex: 4),
-//       Expanded(child: Container(color: Colors.green), flex: 1)
-//     ]);
-//   }
-  
-// }
