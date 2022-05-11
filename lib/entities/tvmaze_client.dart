@@ -14,7 +14,11 @@ class TVMazeClient {
 
   /// GET shows : raw JSON
   Future<String> _getShowsAsync() async {
-    var request = await HttpClient().getUrl(Uri.parse(baseUri + "shows"));
+    var client = HttpClient();
+
+    // I know this is bad, but my phone is also bad :)
+    client.badCertificateCallback = (cert, host, port) => true;
+    var request = await client.getUrl(Uri.parse(baseUri + "shows"));
 
     var response = await request.close();
 

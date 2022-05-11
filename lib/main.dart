@@ -30,17 +30,20 @@ class DetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var show = ModalRoute.of(context)!.settings.arguments as Show;
+    Show show = ModalRoute.of(context)?.settings.arguments as Show;
     return Scaffold(
       appBar: SharedWidgets().mainAppBar,
-      body: Center(
+      body: GestureDetector(
         child: Container(
-          child: RichText(text: TextSpan(text: show.name)),
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: NetworkImage(
-                      show.image["original"] ?? show.image["medium"]))),
-        ),
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: NetworkImage(
+                        show.image["original"] ?? show.image["medium"]),
+                    colorFilter: const ColorFilter.mode(
+                        Color.fromARGB(255, 0, 0, 0), BlendMode.darken)))),
+        onTap: () {
+          Navigator.of(context).pushReplacementNamed("/");
+        },
       ),
     );
   }
@@ -66,20 +69,24 @@ class _HomePageState extends State<HomePage> {
           List<Widget> children = List.empty(growable: true);
           if (snapshot.hasData) {
             for (var show in snapshot.data!.shows) {
-              children.add(GestureDetector(
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: Image.network(show.image["medium"]), flex: 1),
-                    Expanded(child: Text(show.name), flex: 2),
-                  ],
-                ),
-                onTap: () {
-                  // Change state
-                  Navigator.of(context)
-                      .pushReplacementNamed("/details", arguments: show);
-                },
-              ));
+              String filter = "the"; // Implement this
+              if (RegExp(".*" + filter.toLowerCase() + ".*")
+                  .hasMatch(show.name.toLowerCase())) {
+                children.add(GestureDetector(
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Image.network(show.image["medium"]), flex: 1),
+                      Expanded(child: Text(show.name), flex: 2),
+                    ],
+                  ),
+                  onTap: () {
+                    // Change state
+                    Navigator.of(context)
+                        .pushReplacementNamed("/details", arguments: show);
+                  },
+                ));
+              }
             }
           } else if (snapshot.hasError) {
             children = <Widget>[
@@ -108,7 +115,6 @@ class _HomePageState extends State<HomePage> {
           }
           return SingleChildScrollView(
               child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: children,
           ));
         },
