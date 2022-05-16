@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
 import 'package:flutter_test_1/entities/tvmaze_client.dart';
-import 'package:universal_io/prefer_universal/io.dart';
 
 void main() => runApp(const MyApp());
 
@@ -30,22 +29,81 @@ class DetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Show show = ModalRoute.of(context)?.settings.arguments as Show;
+    var args = (ModalRoute.of(context)?.settings.arguments ??
+        <String, dynamic>{}) as Map;
+    final Show show;
+    if (args["show"] == null) {
+      show = Show(-1, "Film not found", [], "", <String, dynamic>{"average": 0},
+          <String, dynamic>{}, "How did you get here?");
+    } else {
+      show = args["show"];
+    }
+
     return Scaffold(
       appBar: SharedWidgets().mainAppBar,
       body: GestureDetector(
         child: Container(
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: NetworkImage(
-                        show.image["original"] ?? show.image["medium"]),
-                    colorFilter: const ColorFilter.mode(
-                        Color.fromARGB(255, 0, 0, 0), BlendMode.darken)))),
+          child: Container(
+            decoration:
+                const BoxDecoration(color: Color.fromARGB(100, 0, 0, 0)),
+            child: RichText(
+              text: TextSpan(children: [
+                TextSpan(
+                    text: show.name,
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold)),
+                TextSpan(text: "Description " + show.summary),
+                TextSpan(text: "" + show.rating["average"].toString())
+              ], style: TextStyle(color: scheme.onSecondary)),
+            ),
+          ),
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: NetworkImage(show.image["original"] ??
+                      show.image["medium"] ??
+                      "https://images.unsplash.com/photo-1577460551100-907ba84418ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxMjA3fDB8MXxzZWFyY2h8MXx8dHVtYmxld2VlZHx8MHx8fHwxNjI2ODcxMjU2&ixlib=rb-1.2.1&q=80&w=1080"),
+                  colorFilter: const ColorFilter.mode(
+                      Color.fromARGB(255, 0, 0, 0), BlendMode.color),
+                  fit: BoxFit.cover)),
+          alignment: Alignment.topCenter,
+        ),
         onTap: () {
           Navigator.of(context).pushReplacementNamed("/");
         },
       ),
     );
+  }
+
+  List<Widget> getRatingIcons(double rating) {
+    List<Widget> ratingIcons = List.empty(growable: true);
+    var localRating = rating;
+    Color iconColour = Colors.red;
+
+    if (rating >= 3) {
+      iconColour = Colors.orange;
+    } else if (rating >= 6) {
+      iconColour = Colors.green;
+    } else if (rating >= 9.5) {
+      iconColour = Colors.amber;
+    }
+
+    while (localRating > 0) {
+      if (localRating - 1 >= -.25) {
+        localRating--;
+        ratingIcons.add(Icon(Icons.star_rounded, color: iconColour));
+      } else if (localRating - .5 >= -.25) {
+        localRating - .5;
+        ratingIcons.add(Icon(Icons.star_half_rounded, color: iconColour));
+      }
+    }
+
+    return (ratingIcons.isEmpty)
+        ? [
+            const Icon(Icons.star_border_rounded, color: Colors.grey),
+            const Icon(Icons.star_border_rounded, color: Colors.grey),
+            const Icon(Icons.star_border_rounded, color: Colors.grey)
+          ]
+        : ratingIcons;
   }
 }
 
@@ -82,8 +140,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onTap: () {
                     // Change state
-                    Navigator.of(context)
-                        .pushReplacementNamed("/details", arguments: show);
+                    Navigator.of(context).pushReplacementNamed("/details",
+                        arguments: {"show": show});
                   },
                 ));
               }
