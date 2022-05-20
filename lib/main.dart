@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
@@ -46,16 +47,19 @@ class DetailsPage extends StatelessWidget {
           child: Container(
             decoration:
                 const BoxDecoration(color: Color.fromARGB(100, 0, 0, 0)),
-            child: RichText(
-              text: TextSpan(children: [
-                TextSpan(
-                    text: show.name,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold)),
-                TextSpan(text: "Description " + show.summary),
-                TextSpan(text: "" + show.rating["average"].toString())
-              ], style: TextStyle(color: scheme.onSecondary)),
-            ),
+            child: Column(children: [
+              RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                      text: show.name,
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold)),
+                  TextSpan(text: "Description " + show.summary),
+                  TextSpan(text: "" + show.rating["average"].toString())
+                ], style: TextStyle(color: scheme.onSecondary)),
+              ),
+              Row(children: getRatingIcons(show.rating["average"]))
+            ]),
           ),
           decoration: BoxDecoration(
               image: DecorationImage(
@@ -76,24 +80,26 @@ class DetailsPage extends StatelessWidget {
 
   List<Widget> getRatingIcons(double rating) {
     List<Widget> ratingIcons = List.empty(growable: true);
-    var localRating = rating;
+    var localRating = rating * 0.5;
     Color iconColour = Colors.red;
 
-    if (rating >= 3) {
-      iconColour = Colors.orange;
+    if (rating >= 9.5) {
+      iconColour = Colors.yellow;
     } else if (rating >= 6) {
       iconColour = Colors.green;
-    } else if (rating >= 9.5) {
-      iconColour = Colors.amber;
+    } else if (rating >= 3) {
+      iconColour = Colors.orange;
     }
 
     while (localRating > 0) {
-      if (localRating - 1 >= -.25) {
-        localRating--;
+      if (localRating - 1 >= -0.25) {
+        localRating -= 1;
         ratingIcons.add(Icon(Icons.star_rounded, color: iconColour));
-      } else if (localRating - .5 >= -.25) {
-        localRating - .5;
+      } else if (localRating - 0.5 >= -0.25) {
+        localRating -= 0.5;
         ratingIcons.add(Icon(Icons.star_half_rounded, color: iconColour));
+      } else {
+        break;
       }
     }
 
@@ -119,6 +125,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var args = (ModalRoute.of(context)?.settings.arguments ??
+        <String, dynamic>{}) as Map;
+    final String filter;
+    (args["filter"] == null) ? filter = "" : filter = args["filter"];
+
     return Scaffold(
       appBar: SharedWidgets().mainAppBar,
       body: FutureBuilder<ShowList>(
@@ -127,16 +138,21 @@ class _HomePageState extends State<HomePage> {
           List<Widget> children = List.empty(growable: true);
           if (snapshot.hasData) {
             for (var show in snapshot.data!.shows) {
-              String filter = "the"; // Implement this
+              // Implement this
               if (RegExp(".*" + filter.toLowerCase() + ".*")
                   .hasMatch(show.name.toLowerCase())) {
                 children.add(GestureDetector(
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Image.network(show.image["medium"]), flex: 1),
-                      Expanded(child: Text(show.name), flex: 2),
-                    ],
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Image.network(show.image["medium"]),
+                            flex: 1),
+                        Expanded(child: Text(show.name), flex: 2)
+                      ],
+                    ),
+                    height: 200,
+                    margin: const EdgeInsets.only(top: 10),
                   ),
                   onTap: () {
                     // Change state
@@ -171,10 +187,9 @@ class _HomePageState extends State<HomePage> {
               )
             ];
           }
-          return SingleChildScrollView(
-              child: Column(
+          return ListView(
             children: children,
-          ));
+          );
         },
       ),
     );
