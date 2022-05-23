@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
@@ -58,7 +57,7 @@ class DetailsPage extends StatelessWidget {
                   TextSpan(text: "" + show.rating["average"].toString())
                 ], style: TextStyle(color: scheme.onSecondary)),
               ),
-              Row(children: getRatingIcons(show.rating["average"]))
+              Row(children: getRatingIcons(show.rating["average"] ?? -1))
             ]),
           ),
           decoration: BoxDecoration(
@@ -78,7 +77,7 @@ class DetailsPage extends StatelessWidget {
     );
   }
 
-  List<Widget> getRatingIcons(double rating) {
+  List<Widget> getRatingIcons(dynamic rating) {
     List<Widget> ratingIcons = List.empty(growable: true);
     var localRating = rating * 0.5;
     Color iconColour = Colors.red;
@@ -105,6 +104,8 @@ class DetailsPage extends StatelessWidget {
 
     return (ratingIcons.isEmpty)
         ? [
+            const Icon(Icons.star_border_rounded, color: Colors.grey),
+            const Icon(Icons.star_border_rounded, color: Colors.grey),
             const Icon(Icons.star_border_rounded, color: Colors.grey),
             const Icon(Icons.star_border_rounded, color: Colors.grey),
             const Icon(Icons.star_border_rounded, color: Colors.grey)

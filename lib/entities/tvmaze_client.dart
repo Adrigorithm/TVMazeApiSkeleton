@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
 import 'package:universal_io/io.dart';
 
 import 'package:flutter_test_1/entities/show.dart';
@@ -14,14 +15,36 @@ class TVMazeClient {
 
   /// GET shows : raw JSON
   Future<String> _getShowsAsync() async {
-    var client = HttpClient();
+    String showsJson = "";
 
-    // I know this is bad, but my phone is also bad :)
-    client.badCertificateCallback = (cert, host, port) => true;
-    var request = await client.getUrl(Uri.parse(baseUri + "shows"));
+    try {
+      var client = HttpClient();
 
-    var response = await request.close();
+      // I know this is bad, but my phone is also bad :)
+      client.badCertificateCallback = (cert, host, port) => true;
+      var request = await client.getUrl(Uri.parse(baseUri + "shows"));
 
-    return await response.transform(const Utf8Decoder()).join();
+      var response = await request.close();
+      showsJson = await response.transform(const Utf8Decoder()).join();
+      _writeShowsCache(showsJson);
+    } catch (e) {
+      showsJson = await _readShowsCache();
+    }
+
+    return showsJson;
+  }
+
+  void _writeShowsCache(String data) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File(directory.path + "/shows.json");
+
+    await file.writeAsString(data);
+  }
+
+  Future<String> _readShowsCache() async {
+    final file =
+        File((await getApplicationDocumentsDirectory()).path + "/shows.json");
+
+    return file.existsSync() ? await file.readAsString() : "";
   }
 }
