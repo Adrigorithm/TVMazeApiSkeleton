@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_test_1/components/shared.dart';
@@ -62,9 +64,10 @@ class DetailsPage extends StatelessWidget {
           ),
           decoration: BoxDecoration(
               image: DecorationImage(
-                  image: NetworkImage(show.image["original"] ??
-                      show.image["medium"] ??
-                      "https://images.unsplash.com/photo-1577460551100-907ba84418ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxMjA3fDB8MXxzZWFyY2h8MXx8dHVtYmxld2VlZHx8MHx8fHwxNjI2ODcxMjU2&ixlib=rb-1.2.1&q=80&w=1080"),
+                  image: Image.network(show.image["original"],
+                      errorBuilder: (context, error, stackTrace) {
+                    return Image.file(File("images/coverFullDefault.png"));
+                  }).image,
                   colorFilter: const ColorFilter.mode(
                       Color.fromARGB(255, 0, 0, 0), BlendMode.color),
                   fit: BoxFit.cover)),
@@ -147,7 +150,11 @@ class _HomePageState extends State<HomePage> {
                     child: Row(
                       children: [
                         Expanded(
-                            child: Image.network(show.image["medium"]),
+                            child: Image.network(show.image["medium"],
+                                errorBuilder: (context, error, stackTrace) {
+                              return Image.file(
+                                  File("images/coverDefault.png"));
+                            }),
                             flex: 1),
                         Expanded(child: Text(show.name), flex: 2)
                       ],
