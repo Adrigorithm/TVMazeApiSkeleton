@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
 import 'package:flutter_test_1/entities/tvmaze_client.dart';
+import 'package:html/parser.dart';
 
 void main() => runApp(const MyApp());
 
@@ -44,35 +45,39 @@ class DetailsPage extends StatelessWidget {
     return Scaffold(
       appBar: SharedWidgets().mainAppBar,
       body: GestureDetector(
-        child: Container(
-          child: Container(
-            decoration:
-                const BoxDecoration(color: Color.fromARGB(100, 0, 0, 0)),
-            child: Column(children: [
-              RichText(
-                text: TextSpan(children: [
-                  TextSpan(
-                      text: show.name,
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold)),
-                  TextSpan(text: "Description " + show.summary),
-                  TextSpan(text: "" + show.rating["average"].toString())
-                ], style: TextStyle(color: scheme.onSecondary)),
-              ),
-              Row(children: getRatingIcons(show.rating["average"] ?? -1))
-            ]),
+        child: Stack(children: [
+          DecoratedBox(
+            child: FittedBox(
+              child: Image.network(show.image["original"],
+                  errorBuilder: (context, error, stackTrace) {
+                return Image.file(File("images/coverFullDefault.png"));
+              }),
+              fit: BoxFit.cover,
+            ),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[
+                  Colors.black87,
+                  Colors.black.withAlpha(0)
+                ])),
+            position: DecorationPosition.foreground,
           ),
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: Image.network(show.image["original"],
-                      errorBuilder: (context, error, stackTrace) {
-                    return Image.file(File("images/coverFullDefault.png"));
-                  }).image,
-                  colorFilter: const ColorFilter.mode(
-                      Color.fromARGB(255, 0, 0, 0), BlendMode.color),
-                  fit: BoxFit.cover)),
-          alignment: Alignment.topCenter,
-        ),
+          Column(children: [
+            RichText(
+              text: TextSpan(children: [
+                TextSpan(
+                    text: show.name,
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold)),
+                TextSpan(text: "Description " + parse(show.summary).outerHtml),
+                TextSpan(text: "" + show.rating["average"].toString())
+              ], style: TextStyle(color: scheme.onSecondary)),
+            ),
+            Row(children: getRatingIcons(show.rating["average"] ?? -1))
+          ])
+        ], fit: StackFit.expand),
         onTap: () {
           Navigator.of(context).pushReplacementNamed("/");
         },
