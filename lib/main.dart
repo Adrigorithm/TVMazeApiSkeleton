@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test_1/pages/details.dart';
-import 'package:flutter_test_1/pages/favourites.dart';
 import 'package:flutter_test_1/pages/home.dart';
 
 void main() => runApp(const MyApp());
@@ -18,8 +17,7 @@ class MyApp extends StatelessWidget {
         initialRoute: "/",
         home: const HomePage(),
         routes: <String, WidgetBuilder>{
-          '/details': (BuildContext context) => const DetailsPage(),
-          '/favourites': (BuildContext context) => const FavouritesPage()
+          '/details': (BuildContext context) => const DetailsPage()
         });
   }
 }

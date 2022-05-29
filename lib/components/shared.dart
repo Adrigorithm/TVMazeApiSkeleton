@@ -27,7 +27,7 @@ class SharedWidgets {
 class IOManager {
   static Future<String> readFile(String fileName) async {
     final file = File((await _getCachingDirectory()).path + "/" + fileName);
-    return await file.readAsString();
+    return await file.exists() ? await file.readAsString() : "";
   }
 
   static void saveFile(String fileName, String content) async {

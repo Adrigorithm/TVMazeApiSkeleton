@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
+import 'package:flutter_test_1/helpers/extensions.dart';
 import 'package:flutter_test_1/main.dart';
-import 'package:html/parser.dart';
 
 class DetailsPage extends StatelessWidget {
   const DetailsPage({Key? key}) : super(key: key);
@@ -50,7 +50,7 @@ class DetailsPage extends StatelessWidget {
                     text: show.name,
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold)),
-                TextSpan(text: "Description " + parse(show.summary).outerHtml),
+                TextSpan(text: "Description " + show.summary.removeHTMLTags()),
                 TextSpan(text: "" + show.rating["average"].toString())
               ], style: TextStyle(color: scheme.onSecondary)),
             ),

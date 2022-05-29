@@ -17,8 +17,8 @@ extension CrudOperations on List<Show> {
   }
 }
 
-extension CrudOperations1 on Show {
-  void triggerFavourite() {
-    if (isFavourite) {}
+extension StringManipulation on String {
+  String removeHTMLTags() {
+    return replaceAll(RegExp("<[^>]+>"), "");
   }
 }

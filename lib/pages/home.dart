@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
           if (snapshot.hasData) {
             List<Show> filteredList;
             var filterTrimmed = filter.trim().toLowerCase();
-            if (filterTrimmed[0] == '*') {
+            if (filterTrimmed.isNotEmpty && filterTrimmed[0] == '*') {
               filteredList = snapshot.data!.shows
                   .where((show) =>
                       show.isFavourite &&
@@ -46,22 +46,53 @@ class _HomePageState extends State<HomePage> {
                   .toList();
             }
 
+            children.add(TextField(
+              decoration: const InputDecoration(
+                  labelText: "filter", hintText: "*filter favourites"),
+              onSubmitted: (String input) {
+                Navigator.of(context)
+                    .pushReplacementNamed("/", arguments: {"filter": input});
+              },
+            ));
+
             for (var show in filteredList) {
               children.add(GestureDetector(
                 child: Container(
                   child: Row(
                     children: [
-                      Expanded(
-                          child: Image.network(show.image["medium"],
-                              errorBuilder: (context, error, stackTrace) {
-                            return Image.file(File("images/coverDefault.png"));
-                          }),
-                          flex: 1),
-                      Expanded(child: Text(show.name), flex: 2)
+                      Image.network(show.image["medium"], height: 200,
+                          errorBuilder: (context, error, stackTrace) {
+                        return Image.file(File("images/coverDefault.png"));
+                      }),
+                      Column(
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                                style: DefaultTextStyle.of(context).style,
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: show.name + "\n",
+                                      style: const TextStyle(
+                                          fontSize: 26,
+                                          fontWeight: FontWeight.bold)),
+                                  TextSpan(
+                                      text: show.rating["average"].toString() +
+                                          "\n\n"),
+                                  const TextSpan(
+                                      text: "Favouorite: ",
+                                      style: TextStyle(fontSize: 20))
+                                ]),
+                          ),
+                          Icon(
+                              (show.isFavourite)
+                                  ? Icons.star_rounded
+                                  : Icons.star_outline_rounded,
+                              color: Colors.amber)
+                        ],
+                      )
                     ],
                   ),
-                  height: 200,
-                  margin: const EdgeInsets.only(top: 10),
+                  margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
                 ),
                 onTap: () {
                   // Change state
@@ -95,9 +126,7 @@ class _HomePageState extends State<HomePage> {
               )
             ];
           }
-          return ListView(
-            children: children,
-          );
+          return ListView(children: children);
         },
       ),
     );
