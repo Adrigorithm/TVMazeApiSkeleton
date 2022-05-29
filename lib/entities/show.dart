@@ -1,7 +1,7 @@
 // Minimalistic model
 class Show {
   Show(this.id, this.name, this.genres, this.premiered, this.rating, this.image,
-      this.summary);
+      this.summary, this.isFavourite);
 
   final int id;
   final String name;
@@ -10,15 +10,23 @@ class Show {
   final Map<String, dynamic> rating;
   final Map<String, dynamic> image;
   final String summary;
+  bool isFavourite;
 
   factory Show.fromJson(Map<String, dynamic> data) {
-    return Show(data["id"], data["name"], data["genres"], data["premiered"],
-        data["rating"], data["image"], data["summary"]);
+    return Show(
+        data["id"],
+        data["name"],
+        data["genres"],
+        data["premiered"],
+        data["rating"],
+        data["image"],
+        data["summary"],
+        data["isFavourite"] ?? false);
   }
 }
 
 class ShowList {
-  final List<Show> shows;
+  List<Show> shows;
 
   ShowList(this.shows);
 

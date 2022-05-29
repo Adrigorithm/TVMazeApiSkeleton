@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_test_1/helpers/extensions.dart';
 import 'package:universal_io/io.dart';
 
+import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
 import 'package:flutter_test_1/secret/secret.dart';
 
@@ -10,7 +11,9 @@ class TVMazeClient {
   final String baseUri = "https://api.tvmaze.com/";
 
   Future<ShowList> getShows() async {
-    return ShowList.fromJson(jsonDecode(await _getShowsAsync()));
+    var showList = ShowList.fromJson(jsonDecode((await _getShowsAsync())));
+    showList.shows = await showList.shows.getFavourites();
+    return showList;
   }
 
   /// GET shows : raw JSON
@@ -26,25 +29,11 @@ class TVMazeClient {
 
       var response = await request.close();
       showsJson = await response.transform(const Utf8Decoder()).join();
-      _writeShowsCache(showsJson);
+      IOManager.saveFile("shows.json", showsJson);
+      showsJson = await IOManager.readFile("shows.json");
     } catch (e) {
-      showsJson = await _readShowsCache();
+      showsJson = await IOManager.readFile("shows.json");
     }
-
     return showsJson;
-  }
-
-  void _writeShowsCache(String data) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File(directory.path + "/shows.json");
-
-    await file.writeAsString(data);
-  }
-
-  Future<String> _readShowsCache() async {
-    final file =
-        File((await getApplicationDocumentsDirectory()).path + "/shows.json");
-
-    return file.existsSync() ? await file.readAsString() : "";
   }
 }
