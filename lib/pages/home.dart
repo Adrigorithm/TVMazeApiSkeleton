@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
 import 'package:flutter_test_1/entities/tvmaze_client.dart';
+import 'package:flutter_test_1/helpers/extensions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,6 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Future<ShowList> showsCache = TVMazeClient().getShows();
 
+  /// Async Builds home screen
   @override
   Widget build(BuildContext context) {
     var args = (ModalRoute.of(context)?.settings.arguments ??
@@ -25,7 +27,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: SharedWidgets(context).mainAppBar,
       body: FutureBuilder<ShowList>(
-        future: showsCache, // Future<T>
+        future: showsCache,
         builder: (BuildContext context, AsyncSnapshot<ShowList> snapshot) {
           List<Widget> children = List.empty(growable: true);
           if (snapshot.hasData) {
@@ -76,18 +78,19 @@ class _HomePageState extends State<HomePage> {
                                           fontSize: 26,
                                           fontWeight: FontWeight.bold)),
                                   TextSpan(
-                                      text: show.rating["average"].toString() +
-                                          "\n\n"),
-                                  const TextSpan(
-                                      text: "Favouorite: ",
-                                      style: TextStyle(fontSize: 20))
+                                      text: show.rating["average"].toString())
                                 ]),
                           ),
-                          Icon(
-                              (show.isFavourite)
-                                  ? Icons.star_rounded
-                                  : Icons.star_outline_rounded,
-                              color: Colors.amber)
+                          IconButton(
+                            icon: Icon(
+                                (show.isFavourite)
+                                    ? Icons.star_rounded
+                                    : Icons.star_outline_rounded,
+                                color: Colors.amber),
+                            onPressed: () {
+                              show.saveFavourite();
+                            },
+                          )
                         ],
                       )
                     ],

@@ -9,6 +9,7 @@ class MyApp extends StatelessWidget {
 
   static const String _title = 'Flutter Code Sample';
 
+  /// Defines routing table and app root (starting point)
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

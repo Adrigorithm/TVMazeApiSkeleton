@@ -10,13 +10,14 @@ class TVMazeClient {
   final String token = Secret.tvMazeToken;
   final String baseUri = "https://api.tvmaze.com/";
 
+  /// Converts raw json to dart objects
   Future<ShowList> getShows() async {
     var showList = ShowList.fromJson(jsonDecode((await _getShowsAsync())));
     showList.shows = await showList.shows.getFavourites();
     return showList;
   }
 
-  /// GET shows : raw JSON
+  /// GET shows from cache or HTTP if connected to the internet
   Future<String> _getShowsAsync() async {
     String showsJson = "";
 

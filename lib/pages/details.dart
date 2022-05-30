@@ -9,6 +9,7 @@ import 'package:flutter_test_1/main.dart';
 class DetailsPage extends StatelessWidget {
   const DetailsPage({Key? key}) : super(key: key);
 
+  /// Builds details page
   @override
   Widget build(BuildContext context) {
     var args = (ModalRoute.of(context)?.settings.arguments ??
@@ -50,8 +51,10 @@ class DetailsPage extends StatelessWidget {
                     text: show.name,
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold)),
-                TextSpan(text: "Description " + show.summary.removeHTMLTags()),
-                TextSpan(text: "" + show.rating["average"].toString())
+                TextSpan(text: show.premiered),
+                TextSpan(
+                    text: "\n\nDescription " + show.summary.removeHTMLTags()),
+                TextSpan(text: "\n\n" + show.rating["average"].toString())
               ], style: TextStyle(color: scheme.onSecondary)),
             ),
             Row(children: getRatingIcons(show.rating["average"] ?? -1))
@@ -64,6 +67,7 @@ class DetailsPage extends StatelessWidget {
     );
   }
 
+  /// Returns a set of coloured icons based on the shows average rating.
   List<Widget> getRatingIcons(dynamic rating) {
     List<Widget> ratingIcons = List.empty(growable: true);
     var localRating = rating * 0.5;

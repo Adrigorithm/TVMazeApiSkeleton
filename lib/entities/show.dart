@@ -12,6 +12,7 @@ class Show {
   final String summary;
   bool isFavourite;
 
+  /// Data model abstraction
   factory Show.fromJson(Map<String, dynamic> data) {
     return Show(
         data["id"],

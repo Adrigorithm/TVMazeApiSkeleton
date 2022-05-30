@@ -1,13 +1,36 @@
-# flutter_test_1
+# TVMazeAPISkeleton
 
-Yeah the name sucks, I will change this sometime (maybe).
-This app does what the repo description says.
-Nothing else really.
+I really couldn't come up with a better name. This is a flutter project with minimal coverage of the TVMaze API, as the name suggests.
 
 ## Getting Started
 
 You can clone this I guess, setup your working env using the official documentation (link below). I recommend using VSCode, "It just works", especially if your pc runs on Linux (If you use Vim I will visit you at night >:) ).
 
-For help getting started with Flutter, view our
+For help getting started with Flutter, view the
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Main Features
+
+The homescreen prsents you with a list of shows (ENDPOINT: api.tvmaze.com/shows)
+
+![Homescreen](https://content-eu.drive.amazonaws.com/cdproxy/templink/QtvfOVHx03B9QtHwVJGaKJyiiF5utf9_TDHsDqM0oZAeJxFPc?viewBox=1266%2C713 "List of shows")
+
+Additionally, the homescreen has a search function.
+Used filter: =="ue blo"==
+
+![Homescreen](https://content-eu.drive.amazonaws.com/cdproxy/templink/tuD9Vz5PWZYWw-jzqXdk7hsqfMZHi8gHPbTaY6TSMAQeJxFPc?viewBox=1266%2C713 "Filter: ue blo")
+
+Prefixing with an asterix (*) will search only through favourites.
+Used filter: =="*blood"==
+
+![Homescreen](https://content-eu.drive.amazonaws.com/cdproxy/templink/eFCAx8qOTuZMOC8N_e-U4AkBnbJ8Tzppl71riZQeuN8eJxFPc?viewBox=1266%2C713 "Filter: *blood")
+
+
+When one of the shows is being clicked on you are transferred to the corresponding details page (this does not make additional API calls).
+
+![Detailscreen](https://content-eu.drive.amazonaws.com/cdproxy/templink/qiKAS4U-u5lagUl9oVHSXGqG4suVNutm-jZwEJZxKrIeJxFPc?viewBox=1266%2C713 "Show details")
+
+## Questions / Contact
+
+You can contact me either through channels my github account reveals or Discord (Adri#8488)
