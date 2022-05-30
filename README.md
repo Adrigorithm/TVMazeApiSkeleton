@@ -20,7 +20,7 @@ The homescreen prsents you with a list of shows (ENDPOINT: api.tvmaze.com/shows)
 Additionally, the homescreen has a search function.
 Used filter: "ue blo"
 
-![image](https://user-images.githubusercontent.com/12832161/171044780-6405ac27-e479-4ee8-a537-88ac16263eaa.png)
+![image](https://user-images.githubusercontent.com/12832161/171045016-ec464ffc-a45a-41d5-8ecd-027fa96ecbd4.png)
 
 Prefixing with an asterix (*) will search only through favourites.
 Used filter: "*blood"
