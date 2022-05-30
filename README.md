@@ -17,12 +17,12 @@ The homescreen prsents you with a list of shows (ENDPOINT: api.tvmaze.com/shows)
 ![Homescreen](https://content-eu.drive.amazonaws.com/cdproxy/templink/QtvfOVHx03B9QtHwVJGaKJyiiF5utf9_TDHsDqM0oZAeJxFPc?viewBox=1266%2C713 "List of shows")
 
 Additionally, the homescreen has a search function.
-Used filter: =="ue blo"==
+Used filter: **"ue blo"**
 
 ![Homescreen](https://content-eu.drive.amazonaws.com/cdproxy/templink/tuD9Vz5PWZYWw-jzqXdk7hsqfMZHi8gHPbTaY6TSMAQeJxFPc?viewBox=1266%2C713 "Filter: ue blo")
 
 Prefixing with an asterix (*) will search only through favourites.
-Used filter: =="*blood"==
+Used filter: **"*blood"**
 
 ![Homescreen](https://content-eu.drive.amazonaws.com/cdproxy/templink/eFCAx8qOTuZMOC8N_e-U4AkBnbJ8Tzppl71riZQeuN8eJxFPc?viewBox=1266%2C713 "Filter: *blood")
 
