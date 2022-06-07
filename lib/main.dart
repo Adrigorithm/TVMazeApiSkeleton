@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test_1/pages/details.dart';
 import 'package:flutter_test_1/pages/home.dart';
 
 void main() => runApp(const MyApp());
@@ -13,13 +12,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: ThemeData.from(colorScheme: scheme),
-        title: _title,
-        initialRoute: "/",
-        home: const HomePage(),
-        routes: <String, WidgetBuilder>{
-          '/details': (BuildContext context) => const DetailsPage()
-        });
+      theme: ThemeData.from(colorScheme: scheme),
+      title: _title,
+      home: HomePage(),
+    );
   }
 }
 

@@ -7,21 +7,13 @@ import 'package:flutter_test_1/helpers/extensions.dart';
 import 'package:flutter_test_1/main.dart';
 
 class DetailsPage extends StatelessWidget {
-  const DetailsPage({Key? key}) : super(key: key);
+  const DetailsPage({Key? key, required this.show}) : super(key: key);
+
+  final Show show;
 
   /// Builds details page
   @override
   Widget build(BuildContext context) {
-    var args = (ModalRoute.of(context)?.settings.arguments ??
-        <String, dynamic>{}) as Map;
-    final Show show;
-    if (args["show"] == null) {
-      show = Show(-1, "Film not found", [], "", <String, dynamic>{"average": 0},
-          <String, dynamic>{}, "How did you get here?", false);
-    } else {
-      show = args["show"];
-    }
-
     return Scaffold(
       appBar: SharedWidgets(context).mainAppBar,
       body: GestureDetector(
