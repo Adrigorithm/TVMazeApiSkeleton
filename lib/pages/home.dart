@@ -5,6 +5,8 @@ import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
 import 'package:flutter_test_1/entities/tvmaze_client.dart';
 import 'package:flutter_test_1/helpers/extensions.dart';
+import 'package:flutter_test_1/main.dart';
+import 'package:flutter_test_1/pages/details.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -85,35 +87,36 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       child: Container(
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.network(show.image["medium"], height: 200,
                 errorBuilder: (context, error, stackTrace) {
               return Image.file(File("images/coverDefault.png"));
             }),
-            Column(
-              children: [
-                RichText(
-                  text: TextSpan(
-                      style: DefaultTextStyle.of(context).style,
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: show.name + "\n",
-                            style: const TextStyle(
-                                fontSize: 26, fontWeight: FontWeight.bold)),
-                        TextSpan(text: show.rating["average"].toString())
-                      ]),
-                ),
-                IconButton(
-                  icon: Icon(
-                      (show.isFavourite)
-                          ? Icons.star_rounded
-                          : Icons.star_outline_rounded,
-                      color: Colors.amber),
-                  onPressed: () {
-                    show.saveFavourite();
-                  },
-                )
-              ],
+            Container(
+              child: RichText(
+                text: TextSpan(
+                    style: TextStyle(color: scheme.onBackground),
+                    children: <TextSpan>[
+                      TextSpan(
+                          text: show.name + "\n",
+                          style: const TextStyle(
+                              fontSize: 26, fontWeight: FontWeight.bold)),
+                      _getRatingStringWidget(show.rating["average"])
+                    ]),
+              ),
+              margin: EdgeInsets.all(10.0),
+            ),
+            IconButton(
+              icon: Icon(
+                  (show.isFavourite)
+                      ? Icons.star_rounded
+                      : Icons.star_outline_rounded,
+                  color: Colors.amber),
+              iconSize: 48,
+              onPressed: () {
+                show.saveFavourite();
+              },
             )
           ],
         ),
@@ -121,9 +124,27 @@ class _HomePageState extends State<HomePage> {
       ),
       onTap: () {
         // Change state
-        Navigator.of(context)
-            .pushReplacementNamed("/details", arguments: {"show": show});
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => DetailsPage(show: show)));
       },
     );
+  }
+
+  TextSpan _getRatingStringWidget(dynamic rating) {
+    if (rating >= 9.5) {
+      return TextSpan(
+          text: rating.toString(),
+          style: const TextStyle(color: Colors.yellow));
+    } else if (rating >= 6) {
+      return TextSpan(
+          text: rating.toString(), style: const TextStyle(color: Colors.green));
+    } else if (rating >= 3) {
+      return TextSpan(
+          text: rating.toString(),
+          style: const TextStyle(color: Colors.deepOrange));
+    }
+
+    return TextSpan(
+        text: rating.toString(), style: TextStyle(color: scheme.onBackground));
   }
 }

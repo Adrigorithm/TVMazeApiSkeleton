@@ -53,7 +53,7 @@ class DetailsPage extends StatelessWidget {
           ])
         ], fit: StackFit.expand),
         onTap: () {
-          Navigator.of(context).pushReplacementNamed("/");
+          Navigator.pop(context);
         },
       ),
     );
