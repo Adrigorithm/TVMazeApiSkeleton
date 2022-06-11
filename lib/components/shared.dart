@@ -33,10 +33,23 @@ class IOManager {
   }
 
   /// Writes file to documents directory
-  static void saveFile(String fileName, String content,
+  static Future<void> saveFile(String fileName, String content,
       {FileMode mode = FileMode.write}) async {
     final file = File((await _getCachingDirectory()).path + "/" + fileName);
     await file.writeAsString(content, mode: mode);
+  }
+
+  static Future<void> removeLine(String fileName, String number) async {
+    final file = File((await _getCachingDirectory()).path + "/" + fileName);
+    var lines = await file.readAsLines();
+    String contentNew = "";
+
+    for (var line in lines) {
+      if (line.trim() != number) {
+        contentNew += line;
+      }
+    }
+    await file.writeAsString(contentNew);
   }
 
   /// returns full app cache path

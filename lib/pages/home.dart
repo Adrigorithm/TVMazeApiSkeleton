@@ -5,133 +5,152 @@ import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
 import 'package:flutter_test_1/entities/tvmaze_client.dart';
 import 'package:flutter_test_1/helpers/extensions.dart';
+import 'package:flutter_test_1/main.dart';
+import 'package:flutter_test_1/pages/details.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
+
+  final Future<ShowList> showsCache = TVMazeClient().getShows();
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final Future<ShowList> showsCache = TVMazeClient().getShows();
+  String filter = "";
+  List<Show> showsFiltered = List.empty();
+
+  void _applyFilter(String showSelection) {
+    setState(() {
+      filter = showSelection;
+    });
+  }
 
   /// Async Builds home screen
   @override
   Widget build(BuildContext context) {
-    var args = (ModalRoute.of(context)?.settings.arguments ??
-        <String, dynamic>{}) as Map;
-    final String filter;
-    (args["filter"] == null) ? filter = "" : filter = args["filter"];
-
     return Scaffold(
       appBar: SharedWidgets(context).mainAppBar,
       body: FutureBuilder<ShowList>(
-        future: showsCache,
+        future: widget.showsCache,
         builder: (BuildContext context, AsyncSnapshot<ShowList> snapshot) {
-          List<Widget> children = List.empty(growable: true);
           if (snapshot.hasData) {
-            List<Show> filteredList;
-            var filterTrimmed = filter.trim().toLowerCase();
-            if (filterTrimmed.isNotEmpty && filterTrimmed[0] == '*') {
-              filteredList = snapshot.data!.shows
-                  .where((show) =>
-                      show.isFavourite &&
-                      show.name
-                          .toLowerCase()
-                          .contains(filterTrimmed.substring(1)))
-                  .toList();
-            } else {
-              filteredList = snapshot.data!.shows
-                  .where(
-                      (show) => show.name.toLowerCase().contains(filterTrimmed))
-                  .toList();
-            }
+            showsFiltered = snapshot.data!.shows
+                .where((show) => show.name.contains(filter))
+                .toList();
 
-            children.add(TextField(
-              decoration: const InputDecoration(
-                  labelText: "filter", hintText: "*filter favourites"),
-              onSubmitted: (String input) {
-                Navigator.of(context)
-                    .pushReplacementNamed("/", arguments: {"filter": input});
-              },
-            ));
-
-            for (var show in filteredList) {
-              children.add(GestureDetector(
-                child: Container(
-                  child: Row(
-                    children: [
-                      Image.network(show.image["medium"], height: 200,
-                          errorBuilder: (context, error, stackTrace) {
-                        return Image.file(File("images/coverDefault.png"));
-                      }),
-                      Column(
-                        children: [
-                          RichText(
-                            text: TextSpan(
-                                style: DefaultTextStyle.of(context).style,
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: show.name + "\n",
-                                      style: const TextStyle(
-                                          fontSize: 26,
-                                          fontWeight: FontWeight.bold)),
-                                  TextSpan(
-                                      text: show.rating["average"].toString())
-                                ]),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                                (show.isFavourite)
-                                    ? Icons.star_rounded
-                                    : Icons.star_outline_rounded,
-                                color: Colors.amber),
-                            onPressed: () {
-                              show.saveFavourite();
-                            },
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                  margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
+            return Column(
+              children: [
+                Autocomplete<Show>(
+                  optionsBuilder: (textEditingValue) {
+                    if (textEditingValue.text.isEmpty) {
+                      return const Iterable<Show>.empty();
+                    }
+                    return showsFiltered;
+                  },
+                  displayStringForOption: (Show show) => show.name,
+                  initialValue: TextEditingValue(text: filter),
+                  onSelected: (Show goodSelection) {
+                    _applyFilter(goodSelection.name);
+                  },
                 ),
-                onTap: () {
-                  // Change state
-                  Navigator.of(context).pushReplacementNamed("/details",
-                      arguments: {"show": show});
-                },
-              ));
-            }
+                Expanded(
+                    child: CustomScrollView(slivers: [
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return _getShowWidget(showsFiltered[index]);
+                      },
+                      childCount: showsFiltered.length,
+                    ),
+                  )
+                ])),
+              ],
+            );
           } else if (snapshot.hasError) {
-            children = <Widget>[
-              const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text('Error: ${snapshot.error}'),
-              )
-            ];
+            return const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 60,
+            );
           } else {
-            children = const <Widget>[
-              SizedBox(
-                width: 60,
-                height: 60,
-                child: CircularProgressIndicator(),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text('Awaiting result...'),
-              )
-            ];
+            return const SizedBox(
+                width: 60, height: 60, child: CircularProgressIndicator());
           }
-          return ListView(children: children);
         },
       ),
     );
+  }
+
+  Widget _getShowWidget(Show show) {
+    return GestureDetector(
+      child: Container(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(
+              show.image["medium"],
+              height: 200,
+              errorBuilder: (context, object, stacktrace) {
+                return Image.file(File("images/coverDefault.png"));
+              },
+            ),
+            Container(
+              child: RichText(
+                text: TextSpan(
+                    style: TextStyle(color: scheme.onBackground),
+                    children: <TextSpan>[
+                      TextSpan(
+                          text: show.name + "\n",
+                          style: const TextStyle(
+                              fontSize: 26, fontWeight: FontWeight.bold)),
+                      _getRatingStringWidget(show.rating["average"])
+                    ]),
+              ),
+              margin: const EdgeInsets.all(10.0),
+            ),
+            IconButton(
+              icon: Icon(
+                  (show.isFavourite)
+                      ? Icons.star_rounded
+                      : Icons.star_outline_rounded,
+                  color: Colors.amber),
+              iconSize: 48,
+              onPressed: () {
+                show.isFavourite
+                    ? show.deleteFavourite()
+                    : show.saveFavourite();
+                _applyFilter(filter);
+              },
+            )
+          ],
+        ),
+        margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
+      ),
+      onTap: () {
+        // Change state
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => DetailsPage(show: show)));
+      },
+    );
+  }
+
+  TextSpan _getRatingStringWidget(dynamic rating) {
+    if (rating >= 9.5) {
+      return TextSpan(
+          text: rating.toString(),
+          style: const TextStyle(color: Colors.yellow));
+    } else if (rating >= 6) {
+      return TextSpan(
+          text: rating.toString(), style: const TextStyle(color: Colors.green));
+    } else if (rating >= 3) {
+      return TextSpan(
+          text: rating.toString(),
+          style: const TextStyle(color: Colors.deepOrange));
+    }
+
+    return TextSpan(
+        text: rating.toString(), style: TextStyle(color: scheme.onBackground));
   }
 }

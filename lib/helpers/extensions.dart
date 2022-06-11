@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test_1/components/shared.dart';
 import 'package:flutter_test_1/entities/show.dart';
-import 'package:universal_io/io.dart';
 
 extension CrudOperations on List<Show> {
   /// Alters showsList to include favourites
@@ -22,8 +22,12 @@ extension CrudOperations on List<Show> {
 extension CrudOperations1 on Show {
   /// Adds favourite by saving show ID
   void saveFavourite() async {
-    IOManager.saveFile("shows_favourites.txt", id.toString() + "\n",
+    await IOManager.saveFile("shows_favourites.txt", id.toString() + "\n",
         mode: FileMode.append);
+  }
+
+  void deleteFavourite() async {
+    await IOManager.removeLine("shows_favourites.txt", id.toString());
   }
 }
 
