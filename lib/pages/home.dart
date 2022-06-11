@@ -89,10 +89,13 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(show.image["medium"], height: 200,
-                errorBuilder: (context, error, stackTrace) {
-              return Image.file(File("images/coverDefault.png"));
-            }),
+            Image.network(
+              show.image["medium"],
+              height: 200,
+              errorBuilder: (context, object, stacktrace) {
+                return Image.file(File("images/coverDefault.png"));
+              },
+            ),
             Container(
               child: RichText(
                 text: TextSpan(
@@ -105,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                       _getRatingStringWidget(show.rating["average"])
                     ]),
               ),
-              margin: EdgeInsets.all(10.0),
+              margin: const EdgeInsets.all(10.0),
             ),
             IconButton(
               icon: Icon(
@@ -115,7 +118,10 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.amber),
               iconSize: 48,
               onPressed: () {
-                show.saveFavourite();
+                show.isFavourite
+                    ? show.deleteFavourite()
+                    : show.saveFavourite();
+                _applyFilter(filter);
               },
             )
           ],
